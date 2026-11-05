@@ -45,7 +45,7 @@ Behavior:
 ./install.sh --uninstall
 ```
 
-Removes the block between the `cc-alias` markers (using `sed`) and leaves the rest
+Removes the block between the `cc-alias` markers, plus the blank separator line before it, and leaves the rest
 of your config untouched. Aliases you added by hand outside the block are not touched.
 Then open a new shell, or run `unalias cc`.
 

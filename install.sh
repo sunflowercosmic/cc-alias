@@ -73,12 +73,23 @@ uninstall_alias() {
     return 0
   fi
 
-  # Delete the marked block. Write to a temp file, then copy back with `cat`
-  # so symlinks and file permissions are preserved (and `sed -i` portability
-  # differences between GNU and BSD/macOS are avoided).
-  local tmp
+  # Locate the block, and also swallow the blank separator line that
+  # install_alias writes just before it, so uninstall leaves no trace.
+  # The edit goes through a temp file + `cat` so symlinks and permissions are
+  # preserved and GNU/BSD `sed -i` differences are avoided.
+  local first last tmp
+  first="$(grep -Fxn "$MARK_BEGIN" "$rc" | head -n 1 | cut -d: -f1)"
+  last="$(grep -Fxn "$MARK_END" "$rc" | cut -d: -f1 | awk -v f="$first" '$1 >= f { print; exit }')"
+  if [ -z "$last" ]; then
+    echo "Found '$MARK_BEGIN' in $rc but no matching end marker; leaving the file untouched." >&2
+    return 1
+  fi
+  if [ "$first" -gt 1 ] && [ -z "$(sed -n "$((first - 1))p" "$rc")" ]; then
+    first=$((first - 1))
+  fi
+
   tmp="$(mktemp)"
-  sed "/^${MARK_BEGIN//\//\\/}\$/,/^${MARK_END//\//\\/}\$/d" "$rc" >"$tmp"
+  sed "${first},${last}d" "$rc" >"$tmp"
   cat "$tmp" >"$rc"
   rm -f "$tmp"
 
