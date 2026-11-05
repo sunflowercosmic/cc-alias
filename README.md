@@ -11,7 +11,7 @@ A tiny, idempotent installer that adds a `cc` shell alias for
 ## Install
 
 ```sh
-git clone https://github.com/<your-user>/cc-alias.git
+git clone https://github.com/sunflowercosmic/cc-alias.git
 cd cc-alias
 ./install.sh
 source ~/.zshrc   # or the file printed by the script
